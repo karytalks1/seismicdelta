@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+.vscode/
+.DS_Store
+# STAAD run artefacts - keep the .std inputs, drop the outputs
+*.anl
+*.bak
+*.dsp
+*.tmp
