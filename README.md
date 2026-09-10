@@ -9,6 +9,10 @@ Pure Python for the analysis. STAAD.Pro for cross-checking. No dependencies.
 python seismic.py          # IS 1893:2016 base shear and storey forces
 python frame2d.py          # 2D frame FE solver - storey drifts and member forces
 python generate_staad.py   # writes three STAAD .std models
+
+python hydrology.py        # Uttarakhand water flow and design floods
+python floodrisk.py        # flood plain zoning and district risk index
+python builtform.py        # construction density, and the seismic cross-link
 ```
 
 ## Why do it twice
@@ -93,6 +97,91 @@ exactly two lines: the job title, and `ZONE 0.1` → `ZONE 0.24`.
 
 Three hours of GUI modelling, done in a second, with the experimental control guaranteed.
 
+
+## Uttarakhand — where that building actually stands
+
+The seismic study above holds everything fixed and varies one thing. This second
+study asks the question the first one leaves open: *what is the site actually
+like?* Uttarakhand, because every one of its 13 districts is in Zone IV or Zone V
+— and because the earthquake is not the only thing trying to remove the building.
+
+Full method, sources and limitations in [`UTTARAKHAND.md`](UTTARAKHAND.md).
+
+**Water flow.** ~46.8 km³/yr of surface water off 53,483 km². The drainage tree
+is routed from incremental sub-catchments and validated against three published
+control totals — Alaknanda at Devprayag 10,882 km², Pashulok barrage 21,400 km²,
+Bhimgoda barrage 23,000 km². The 13 district populations sum to 10,086,292
+exactly, without adjustment.
+
+**Force, not volume, is the hazard.** At the 100-year flood:
+
+| | discharge | width | unit stream power |
+|---|---|---|---|
+| Dhauliganga at Joshimath | 1,125 m³/s | 51 m | **7,543 W/m²** |
+| Ganga at Haridwar | 6,399 m³/s | 2,114 m | **36 W/m²** |
+
+Six times the discharge, one two-hundredth the intensity. Slope does that. One
+inundates buildings; the other removes them — and they need different rules.
+
+**The zoning line is drawn for the wrong event.** Uttarakhand enacted the CWC
+Model Bill as the Flood Plain Zoning Act, 2012 — one of only four states to do so.
+But the Bill manages risk by mapping a wider line for a rarer flood, and a gorge
+cannot widen: Himalayan reaches grow **1.06×** from the 25-year zone to the
+100-year zone, against **5.13×** in the Terai. Zone A and Zone C are nearly the
+same ground.
+
+And the return period is measuring the wrong process. Above Kedarnath the
+100-year flood is 77 m³/s. On 17 June 2013 the observed peak was **1,699 m³/s —
+22× the 100-year flood**, because a moraine dam failed and released volume that
+was in storage, not in the rainfall. Modelled with Evans (1986) plus a debris
+bulking factor of 2.0 it comes back at 1,677 m³/s, within −1.3% — which says the
+mechanism is right, not that the model is accurate.
+
+**Dickens' formula was checked, not trusted.** The standard north Indian
+estimator with the textbook hill coefficient overpredicts this basin's 100-year
+flood by **4.5–6× at every scale from 45 km² to 23,000 km²**. The implied C is
+3.4–4.5 — the *plains* band. C = 14–28 is an envelope of maximum observed floods,
+and an envelope is not a 100-year estimate.
+
+**Construction density — the number everyone quotes is wrong.**
+
+| | per km² |
+|---|---|
+| Uttarakhand, as always quoted | 189 |
+| Bihar, densest major state | 1,106 |
+| **Uttarakhand, per km² of buildable land** | **1,185** |
+
+Only 15.9% of the state can be built on. Measured against that, Uttarakhand is
+denser than Bihar. Rudraprayag looks nearly empty at 122/km²; on buildable land it
+carries 1,628/km², denser than Haridwar.
+
+And the buildable land *is* the hazard: in a steep valley the only flat ground is
+the valley floor and the river terraces. **996,000 dwellings — 48% of the state's
+housing stock — stand on the river-corridor landform**, ~290,000 of them in the
+five districts whose governing reach exceeds 1,000 W/m², the level at which
+masonry does not survive contact with the flow.
+
+**Depopulation is not risk reduction.** Almora and Pauri Garhwal *lost* population
+2001–2011. But in Pauri, rural population fell 5.4% while urban rose 25.4% — people
+leaving high-slope villages move down to the valley-floor town, which is the river
+terrace. A falling district headcount can hide a rising number of buildings in the
+corridor.
+
+**Back to the seismic study.** All 13 districts sit in Zone IV or V, so
+`builtform.py` runs this repo's own G+5 SMRF through `seismic.py` for Zone V too:
+
+| | Z | Vb | vs Zone II |
+|---|---|---|---|
+| Zone II | 0.10 | 409 kN | 1.00× |
+| Zone IV | 0.24 | 982 kN | 2.40× |
+| **Zone V** | 0.36 | **1,473 kN** | **3.60×** |
+
+The headline comparison at the top of this README understates real Uttarakhand
+demand by half again. And the G+5 SMRF is not what is standing there — it is
+random rubble stone masonry in mud mortar, or owner-built RC on a cut-and-fill
+terrace above the Alaknanda. Designing for Zone V while ignoring the slope and the
+river is not a partial solution; in this terrain they are one problem.
+
 ## Loads
 
 Per IS 875 Parts 1 and 2:
@@ -124,7 +213,16 @@ column uplift and is the one most often forgotten.
 | `generate_staad.py` | Parametric STAAD `.std` generation for all three models |
 | `BUILD_SPEC.md` | Full method: loads, code clauses, hand-design procedure |
 | `staad/` | Generated model files |
+| `uk_data.py` | Uttarakhand dataset — districts, drainage tree, reaches, with `[M]`/`[E]` provenance and closure checks |
+| `hydrology.py` | Flow routing, water balance, design floods, compound-section hydraulics, wave travel time |
+| `floodrisk.py` | Flood plain zoning, moraine-breach scenarios, district Hazard × Exposure × Vulnerability index |
+| `builtform.py` | Construction density on buildable land, corridor exposure, seismic cross-link |
+| `UTTARAKHAND.md` | Full method, sources and limitations for the Uttarakhand study |
 
 ## Codes
 
 IS 1893 (Part 1) : 2016 · IS 456 : 2000 · IS 875 (Parts 1 and 2) · IS 13920 : 2016
+
+For the Uttarakhand study: Model Bill for Flood Plain Zoning (CWC, 1975) ·
+Uttarakhand Flood Plain Zoning Act, 2012 · Census of India 2011 · CWC Upper Ganga
+Basin Organisation · FSI ISFR 2019 · BMTPC Vulnerability Atlas of India
