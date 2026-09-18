@@ -12,6 +12,8 @@ python generate_staad.py   # writes three STAAD .std models
 python generate_dxf.py     # AutoCAD plan + frame elevation (drawings/, see AUTOCAD_STEPS.md)
 ```
 
+![Floor plan and frame elevation](drawings/seismicdelta_plan_elevation_preview.png)
+
 ## Why do it twice
 
 Anyone can analyse a building. The interesting question is what *changes* when the demand
