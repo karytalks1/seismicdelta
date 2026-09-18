@@ -9,6 +9,7 @@ Pure Python for the analysis. STAAD.Pro for cross-checking. No dependencies.
 python seismic.py          # IS 1893:2016 base shear and storey forces
 python frame2d.py          # 2D frame FE solver - storey drifts and member forces
 python generate_staad.py   # writes three STAAD .std models
+python generate_dxf.py     # AutoCAD plan + frame elevation (drawings/, see AUTOCAD_STEPS.md)
 ```
 
 ## Why do it twice
